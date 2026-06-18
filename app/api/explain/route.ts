@@ -11,7 +11,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '用語を入力してください' }, { status: 400 });
     }
 
-    // Build category context
     const categoryLines = Object.entries(categoryStats as Record<string, number>)
       .filter(([key]) => !String(key).includes('/') || (String(key).match(/\//g) || []).length < 2)
       .sort((a, b) => b[1] - a[1])
@@ -26,6 +25,7 @@ export async function POST(req: NextRequest) {
     const response = await client.messages.create({
       model: 'claude-opus-4-7',
       max_tokens: 2048,
+      thinking: { type: 'disabled' },
       system: 'あなたはITコンサルタント・システム開発の専門家です。技術用語を分かりやすく解説し、適切に分類します。必ず有効なJSONのみで回答してください。マークダウンや説明文は含めず、JSONオブジェクトのみを返してください。',
       messages: [
         {
@@ -47,14 +47,13 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const content = response.content[0];
-    if (content.type !== 'text') {
-      throw new Error('Unexpected response type');
+    // Find the first text block (skip any thinking blocks)
+    const textBlock = response.content.find(c => c.type === 'text');
+    if (!textBlock || textBlock.type !== 'text') {
+      throw new Error('No text block in response');
     }
 
-    // Parse JSON response - extract JSON from the text
-    let text = content.text.trim();
-    // Remove markdown code blocks if present
+    let text = textBlock.text.trim();
     text = text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim();
 
     const parsed = JSON.parse(text);
