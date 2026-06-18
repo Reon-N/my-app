@@ -19,21 +19,21 @@ function TermCard({ term, onDelete }: { term: Term; onDelete: (id: string) => vo
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:border-blue-300 hover:shadow-sm transition-all">
+    <div className="bg-white rounded-xl border border-slate-100 overflow-hidden hover:border-indigo-100 hover:shadow-[0_2px_16px_rgba(99,102,241,0.08)] transition-all">
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h4 className="font-bold text-slate-800 text-base leading-tight">{term.term}</h4>
+          <h4 className="font-semibold text-slate-800 text-sm leading-snug">{term.term}</h4>
           <div className="flex gap-1 shrink-0">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-slate-400 hover:text-slate-600 text-xs px-2 py-1 hover:bg-slate-100 rounded transition-colors"
+              className="text-slate-400 hover:text-indigo-500 text-xs px-2 py-1 hover:bg-indigo-50 rounded-lg transition-all"
             >
-              {isExpanded ? '▲ 閉じる' : '▼ 詳細'}
+              {isExpanded ? '閉じる' : '詳細'}
             </button>
             {!showDeleteConfirm ? (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-slate-300 hover:text-red-400 text-xs px-2 py-1 hover:bg-red-50 rounded transition-colors"
+                className="text-slate-300 hover:text-red-400 text-xs px-2 py-1 hover:bg-red-50 rounded-lg transition-all"
               >
                 削除
               </button>
@@ -41,13 +41,13 @@ function TermCard({ term, onDelete }: { term: Term; onDelete: (id: string) => vo
               <div className="flex gap-1">
                 <button
                   onClick={() => onDelete(term.id)}
-                  className="text-red-600 hover:text-red-700 text-xs px-2 py-1 bg-red-50 hover:bg-red-100 rounded transition-colors"
+                  className="text-red-600 text-xs px-2 py-1 bg-red-50 hover:bg-red-100 rounded-lg transition-all"
                 >
                   確認
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="text-slate-500 text-xs px-2 py-1 hover:bg-slate-100 rounded transition-colors"
+                  className="text-slate-400 text-xs px-2 py-1 hover:bg-slate-100 rounded-lg transition-all"
                 >
                   ✕
                 </button>
@@ -55,13 +55,13 @@ function TermCard({ term, onDelete }: { term: Term; onDelete: (id: string) => vo
             )}
           </div>
         </div>
-        <p className="text-sm text-slate-600 leading-relaxed">{term.shortExplanation}</p>
+        <p className="text-xs text-slate-500 leading-relaxed">{term.shortExplanation}</p>
 
         {isExpanded && (
-          <div className="mt-3 pt-3 border-t border-slate-100">
-            <p className="text-sm text-slate-500 whitespace-pre-line leading-relaxed">{term.detailedExplanation}</p>
-            <p className="text-xs text-slate-400 mt-2">
-              登録日: {new Date(term.createdAt).toLocaleDateString('ja-JP')}
+          <div className="mt-3 pt-3 border-t border-slate-50">
+            <p className="text-xs text-slate-400 whitespace-pre-line leading-relaxed">{term.detailedExplanation}</p>
+            <p className="text-xs text-slate-300 mt-2">
+              {new Date(term.createdAt).toLocaleDateString('ja-JP')}
             </p>
           </div>
         )}
@@ -69,6 +69,12 @@ function TermCard({ term, onDelete }: { term: Term; onDelete: (id: string) => vo
     </div>
   );
 }
+
+const depthStyles = [
+  { border: 'border-indigo-100', bg: 'bg-indigo-50/40', header: 'bg-gradient-to-r from-indigo-500 to-indigo-600' },
+  { border: 'border-violet-100', bg: 'bg-violet-50/40', header: 'bg-gradient-to-r from-violet-500 to-violet-600' },
+  { border: 'border-purple-100', bg: 'bg-purple-50/40', header: 'bg-gradient-to-r from-purple-500 to-purple-600' },
+];
 
 function CategoryNodeView({
   node,
@@ -82,6 +88,7 @@ function CategoryNodeView({
   searchQuery: string;
 }) {
   const [isExpanded, setIsExpanded] = useState(depth < 2);
+  const style = depthStyles[Math.min(depth, depthStyles.length - 1)];
 
   const allTerms = getAllTerms(node);
   const filteredTerms = searchQuery
@@ -95,15 +102,9 @@ function CategoryNodeView({
 
   if (node.name === 'root') {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {node.children.map(child => (
-          <CategoryNodeView
-            key={child.fullPath}
-            node={child}
-            onDelete={onDelete}
-            depth={depth}
-            searchQuery={searchQuery}
-          />
+          <CategoryNodeView key={child.fullPath} node={child} onDelete={onDelete} depth={depth} searchQuery={searchQuery} />
         ))}
       </div>
     );
@@ -112,63 +113,44 @@ function CategoryNodeView({
   const termCount = allTerms.length;
   if (termCount === 0) return null;
 
-  const bgColors = [
-    'bg-blue-50 border-blue-200',
-    'bg-indigo-50 border-indigo-200',
-    'bg-violet-50 border-violet-200',
-  ];
-  const headerColors = [
-    'bg-blue-600',
-    'bg-indigo-500',
-    'bg-violet-500',
-  ];
-  const bgColor = bgColors[Math.min(depth, bgColors.length - 1)];
-  const headerColor = headerColors[Math.min(depth, headerColors.length - 1)];
-
   const displayTerms = searchQuery ? (filteredTerms || []) : node.terms;
 
   return (
-    <div className={`rounded-xl border ${bgColor} overflow-hidden`}>
+    <div className={`rounded-2xl border ${style.border} ${style.bg} overflow-hidden`}>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-full text-left ${headerColor} text-white px-4 py-3 flex items-center justify-between hover:opacity-90 transition-opacity`}
+        className={`w-full text-left ${style.header} text-white px-5 py-3.5 flex items-center justify-between hover:opacity-95 transition-opacity`}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-lg">{isExpanded ? '▾' : '▸'}</span>
-          <span className="font-semibold">{node.name}</span>
+        <div className="flex items-center gap-2.5">
+          <svg
+            className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          <span className="font-semibold text-sm">{node.name}</span>
           {node.children.length > 0 && (
-            <span className="text-white/70 text-xs">
-              ({node.children.length} サブカテゴリ)
-            </span>
+            <span className="text-white/60 text-xs">{node.children.length} サブカテゴリ</span>
           )}
         </div>
-        <span className="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full font-medium">
-          {termCount} 用語
+        <span className="bg-white/20 text-white text-xs px-2.5 py-0.5 rounded-full font-medium">
+          {termCount}
         </span>
       </button>
 
       {isExpanded && (
-        <div className="p-4 space-y-4">
-          {/* Direct terms */}
+        <div className="p-4 space-y-3">
           {displayTerms.length > 0 && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-2.5 sm:grid-cols-2">
               {displayTerms.map(term => (
                 <TermCard key={term.id} term={term} onDelete={onDelete} />
               ))}
             </div>
           )}
-
-          {/* Sub-categories */}
           {node.children.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {node.children.map(child => (
-                <CategoryNodeView
-                  key={child.fullPath}
-                  node={child}
-                  onDelete={onDelete}
-                  depth={depth + 1}
-                  searchQuery={searchQuery}
-                />
+                <CategoryNodeView key={child.fullPath} node={child} onDelete={onDelete} depth={depth + 1} searchQuery={searchQuery} />
               ))}
             </div>
           )}
@@ -222,81 +204,89 @@ export default function Library() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">用語一覧</h2>
-          <p className="text-slate-500 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">用語一覧</h2>
+          <p className="text-slate-400 text-sm mt-0.5">
             {terms.length} 用語が登録されています
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button
             onClick={handleExport}
             disabled={terms.length === 0 || isExporting}
-            className="flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm text-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
           >
-            <span>📊</span>
-            {isExporting ? 'エクスポート中...' : 'Excelで出力'}
+            <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            {isExporting ? 'エクスポート中...' : 'Excel出力'}
           </button>
           <a
             href="/"
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm text-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-violet-700 transition-all shadow-sm"
           >
-            <span>🔍</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
             用語を追加
           </a>
         </div>
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4">
+      <div className="relative">
+        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
         <input
           type="text"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           placeholder="用語・解説・カテゴリで検索..."
-          className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm placeholder-slate-400 shadow-sm transition-all"
         />
         {searchQuery && (
-          <p className="text-sm text-slate-500 mt-2">
-            {filteredTerms.length} 件が見つかりました
-          </p>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+            {filteredTerms.length} 件
+          </div>
         )}
       </div>
 
       {/* Empty state */}
       {terms.length === 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
-          <div className="text-6xl mb-4">📚</div>
-          <h3 className="text-xl font-semibold text-slate-700 mb-2">用語がまだ登録されていません</h3>
-          <p className="text-slate-500 mb-6">トップページで用語を調べると、自動的に用語集に追加されます</p>
-          <a
-            href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors"
-          >
-            🔍 用語を調べる
+        <div className="bg-white rounded-2xl border border-slate-100 p-16 text-center">
+          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-slate-700 mb-1.5">用語がまだ登録されていません</h3>
+          <p className="text-slate-400 text-sm mb-6">トップページで用語を調べると、自動的に用語集に追加されます</p>
+          <a href="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-all">
+            用語を調べる →
           </a>
         </div>
       )}
 
-      {/* Search results flat view */}
+      {/* Search results */}
       {searchQuery && filteredTerms.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">検索結果</h3>
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-2.5">
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">検索結果</h3>
+          <div className="grid gap-2.5 sm:grid-cols-2">
             {filteredTerms.map(term => (
-              <div key={term.id} className="bg-white rounded-xl border border-slate-200 p-4">
-                <div className="flex items-start justify-between gap-2 mb-2">
+              <div key={term.id} className="bg-white rounded-xl border border-slate-100 p-4">
+                <div className="flex items-start justify-between gap-2 mb-1.5">
                   <div>
-                    <h4 className="font-bold text-slate-800">{term.term}</h4>
-                    <span className="text-xs text-slate-500">{term.category}</span>
+                    <h4 className="font-semibold text-slate-800 text-sm">{term.term}</h4>
+                    <span className="text-xs text-slate-400">{term.category}</span>
                   </div>
                   <button
                     onClick={() => handleDelete(term.id)}
-                    className="text-slate-300 hover:text-red-400 text-xs px-2 py-1 rounded transition-colors"
+                    className="text-slate-300 hover:text-red-400 text-xs px-2 py-1 rounded-lg transition-all"
                   >
                     削除
                   </button>
                 </div>
-                <p className="text-sm text-slate-600">{term.shortExplanation}</p>
+                <p className="text-xs text-slate-500 leading-relaxed">{term.shortExplanation}</p>
               </div>
             ))}
           </div>
@@ -305,12 +295,7 @@ export default function Library() {
 
       {/* Category tree */}
       {!searchQuery && categoryTree && terms.length > 0 && (
-        <CategoryNodeView
-          node={categoryTree}
-          onDelete={handleDelete}
-          depth={0}
-          searchQuery={searchQuery}
-        />
+        <CategoryNodeView node={categoryTree} onDelete={handleDelete} depth={0} searchQuery={searchQuery} />
       )}
     </div>
   );

@@ -45,7 +45,6 @@ export default function Home() {
 
       setResult(data);
 
-      // Auto-save
       const term: Term = {
         id: crypto.randomUUID(),
         term: inputTerm.trim(),
@@ -78,85 +77,110 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
-      {/* Hero section */}
-      <div className="text-center py-8">
-        <h2 className="text-3xl font-bold text-slate-800 mb-3">
-          IT用語を調べる
+      {/* Hero */}
+      <div className="text-center py-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-full mb-4 tracking-wide uppercase">
+          <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>
+          AI-Powered Glossary
+        </div>
+        <h2 className="text-4xl font-bold text-slate-900 tracking-tight mb-3">
+          IT用語を即座に理解する
         </h2>
-        <p className="text-slate-500 text-lg">
-          分からない用語を入力すると、AIが分かりやすく解説します
+        <p className="text-slate-500 text-base max-w-md mx-auto leading-relaxed">
+          分からない用語を入力するだけで、AIが分かりやすい解説と体系的な分類を自動生成します
         </p>
       </div>
 
       {/* Search form */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={inputTerm}
-              onChange={e => setInputTerm(e.target.value)}
-              placeholder="例: Docker、マイクロサービス、スクラム..."
-              className="flex-1 px-5 py-3.5 text-base border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-400"
-              disabled={isLoading}
-            />
+      <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-slate-100 p-5">
+        <form onSubmit={handleSubmit}>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                value={inputTerm}
+                onChange={e => setInputTerm(e.target.value)}
+                placeholder="例: Docker、マイクロサービス、スクラム..."
+                className="w-full pl-10 pr-4 py-3 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 bg-slate-50 transition-all"
+                disabled={isLoading}
+              />
+            </div>
             <button
               type="submit"
               disabled={isLoading || !inputTerm.trim()}
-              className="px-8 py-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap shadow-sm"
+              className="px-5 py-3 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-sm font-semibold rounded-xl hover:from-indigo-600 hover:to-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm whitespace-nowrap"
             >
-              {isLoading ? '生成中...' : '解説を見る'}
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  生成中
+                </span>
+              ) : '解説を見る'}
             </button>
           </div>
         </form>
       </div>
 
-      {/* Loading state */}
+      {/* Loading */}
       {isLoading && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_20px_rgba(0,0,0,0.06)] p-10">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+            <div className="relative w-12 h-12">
+              <div className="absolute inset-0 rounded-full border-4 border-indigo-100"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-indigo-500 animate-spin"></div>
+            </div>
             <div className="text-center">
-              <p className="text-slate-700 font-medium">「{inputTerm}」を解析中...</p>
-              <p className="text-slate-500 text-sm mt-1">AIが解説と分類を生成しています</p>
+              <p className="text-slate-700 font-semibold">「{inputTerm}」を解析中</p>
+              <p className="text-slate-400 text-sm mt-1">AIが解説と分類を生成しています...</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Error state */}
+      {/* Error */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex items-start gap-3">
-          <span className="text-red-500 text-xl">⚠️</span>
+        <div className="flex items-start gap-3 bg-red-50 border border-red-100 rounded-xl p-4">
+          <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+            <svg className="w-3 h-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          </div>
           <div>
-            <p className="text-red-700 font-medium">エラーが発生しました</p>
-            <p className="text-red-600 text-sm mt-1">{error}</p>
+            <p className="text-red-700 text-sm font-semibold">エラーが発生しました</p>
+            <p className="text-red-500 text-sm mt-0.5">{error}</p>
           </div>
         </div>
       )}
 
       {/* Result */}
       {result && savedTerm && (
-        <div className="space-y-4">
-          {/* Saved indicator */}
+        <div className="space-y-3">
           {isSaved && (
-            <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-2">
-              <span className="text-green-600">✅</span>
-              <span className="text-green-700 text-sm font-medium">用語集に保存しました</span>
+            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-2.5">
+              <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="text-emerald-700 text-sm font-medium">用語集に保存しました</span>
             </div>
           )}
 
-          {/* Term header */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
-              <div className="flex items-start justify-between">
+          <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-slate-100 overflow-hidden">
+            {/* Term header */}
+            <div className="bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-700 px-6 py-5">
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-white">{savedTerm.term}</h3>
-                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">{savedTerm.term}</h3>
+                  <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
                     {categoryParts.map((part, i) => (
                       <span key={i} className="flex items-center gap-1">
-                        {i > 0 && <span className="text-blue-300 text-sm">/</span>}
-                        <span className="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full font-medium">
+                        {i > 0 && <span className="text-white/40 text-xs">›</span>}
+                        <span className="bg-white/15 text-white/90 text-xs px-2.5 py-1 rounded-full font-medium backdrop-blur-sm">
                           {part}
                         </span>
                       </span>
@@ -165,49 +189,46 @@ export default function Home() {
                 </div>
                 <button
                   onClick={handleReset}
-                  className="text-white/70 hover:text-white text-sm hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
+                  className="text-white/60 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all shrink-0"
                 >
-                  ✕ 閉じる
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-5">
               {/* Short explanation */}
               <div>
-                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <span className="w-5 h-5 bg-blue-100 text-blue-600 rounded flex items-center justify-center text-xs">📌</span>
-                  かんたん解説
-                </h4>
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                  <p className="text-slate-700 leading-relaxed">{result.shortExplanation}</p>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="text-xs font-semibold text-indigo-500 uppercase tracking-widest">かんたん解説</span>
+                </div>
+                <div className="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100/60 rounded-xl p-4">
+                  <p className="text-slate-700 text-sm leading-relaxed">{result.shortExplanation}</p>
                 </div>
               </div>
 
               {/* Detailed explanation */}
               <div>
-                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <span className="w-5 h-5 bg-slate-100 text-slate-600 rounded flex items-center justify-center text-xs">📖</span>
-                  詳細解説
-                </h4>
-                <div className="prose prose-slate max-w-none">
-                  <p className="text-slate-600 leading-relaxed whitespace-pre-line">{result.detailedExplanation}</p>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">詳細解説</span>
                 </div>
+                <p className="text-slate-600 text-sm leading-7 whitespace-pre-line">{result.detailedExplanation}</p>
               </div>
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-3">
+          <div className="grid grid-cols-2 gap-2">
             <button
               onClick={handleReset}
-              className="flex-1 py-3 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-colors"
+              className="py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 transition-all"
             >
               別の用語を調べる
             </button>
             <a
               href="/library"
-              className="flex-1 py-3 bg-white border border-slate-300 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors text-center"
+              className="py-2.5 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-all text-center"
             >
               用語一覧を見る →
             </a>
@@ -218,19 +239,22 @@ export default function Home() {
       {/* Recent terms */}
       {!result && !isLoading && recentTerms.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">最近調べた用語</h3>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">最近調べた用語</h3>
+          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             {recentTerms.map(term => (
               <button
                 key={term.id}
-                onClick={() => {
-                  setInputTerm(term.term);
-                }}
-                className="text-left bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all group"
+                onClick={() => setInputTerm(term.term)}
+                className="text-left bg-white rounded-xl border border-slate-100 p-4 hover:border-indigo-200 hover:shadow-[0_2px_16px_rgba(99,102,241,0.1)] transition-all group"
               >
-                <div className="font-semibold text-slate-800 group-hover:text-blue-700 mb-1">{term.term}</div>
-                <div className="text-xs text-slate-500 mb-2">{term.category}</div>
-                <p className="text-sm text-slate-600 line-clamp-2">{term.shortExplanation}</p>
+                <div className="flex items-start justify-between gap-2 mb-1.5">
+                  <span className="font-semibold text-slate-800 text-sm group-hover:text-indigo-600 transition-colors">{term.term}</span>
+                  <svg className="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-400 transition-colors shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+                <div className="text-xs text-slate-400 mb-1.5">{term.category}</div>
+                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{term.shortExplanation}</p>
               </button>
             ))}
           </div>
