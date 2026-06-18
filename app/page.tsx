@@ -28,7 +28,10 @@ export default function Home() {
     setSavedTerm(null);
 
     try {
-      const categoryStats = await getCategoryStats();
+      // Supabase failure is non-fatal — proceed with empty stats
+      let categoryStats: Record<string, number> = {};
+      try { categoryStats = await getCategoryStats(); } catch { /* ignore */ }
+
       const response = await fetch('/api/explain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -48,10 +51,15 @@ export default function Home() {
         category: data.category,
         createdAt: new Date().toISOString(),
       };
-      await saveTerm(term);
+
+      // Save and refresh — non-fatal if Supabase is unavailable
+      try {
+        await saveTerm(term);
+        const updated = await getTerms();
+        setRecentTerms(updated.slice(0, 5));
+      } catch { /* ignore */ }
+
       setSavedTerm(term);
-      const updated = await getTerms();
-      setRecentTerms(updated.slice(0, 5));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'エラーが発生しました');
     } finally {
